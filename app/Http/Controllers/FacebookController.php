@@ -8,15 +8,33 @@ class FacebookController extends Controller
 {
     public function webhook(Request $request)
     {
-        $verify_token = 'abcdefg12345678';
+//        $verify_token = 'abcdefg12345678';
+//
+//        $hub_challenge  = $request->hub_challenge;
+//        $hub_verify_token  = $request->hub_verify_token;
+//
+//        if ($verify_token == $hub_verify_token)
+//            return response($hub_challenge, 200);
+//
+//        return response(null, 403);
 
-        $hub_challenge  = $request->hub_challenge;
-        $hub_verify_token  = $request->hub_verify_token;
+        $sender_id = $request->sender->id;
+        $recipient_id = $request->recipient->id;
 
-        if ($verify_token == $hub_verify_token)
-            return response($hub_challenge, 200);
+        $retorno = new class{};
+        $retorno->sender = new class {};
+        $retorno->sender->id = $sender_id;
 
-        return response(null, 403);
+        $retorno->recipient = new class {};
+        $retorno->recipient->id = $recipient_id;
 
+        $retorno->message = new class{};
+        if ($request->message->text == 1) {
+            $retorno->message->text = "deu certo";
+        }
+
+        $retorno->message->text = "não deu certo";
+
+        return response()->json($retorno, 200);
     }
 }
