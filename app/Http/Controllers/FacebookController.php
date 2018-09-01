@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FacebookController extends Controller
 {
@@ -18,8 +19,12 @@ class FacebookController extends Controller
 //
 //        return response(null, 403);
 
+
         $sender_id = $request->sender->id;
         $recipient_id = $request->recipient->id;
+
+        Log::info('$sender_id ' . $sender_id);
+        Log::info('$recipient_id ' . $recipient_id);
 
         $retorno = new class{};
         $retorno->sender = new class {};
