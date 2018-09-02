@@ -19,6 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'webhook'], function ()
 {
-    Route::get('', 'FacebookController@webhook');
-    Route::post('', 'FacebookController@webhook');
+    Route::get('', 'FacebookController@webhookGET');
+    Route::post('', 'FacebookController@webhookPOST');
 });
