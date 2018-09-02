@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 class FacebookController extends Controller
 {
-    const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é'
-    const PLATE_MESSAGE = 'Qual a sua placa?'
-    const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: '
+
+    const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é';
+    const PLATE_MESSAGE = 'Qual a sua placa?';
+    const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: ';
 
     public function webhookGET(Request $request)
     {
@@ -23,7 +24,7 @@ class FacebookController extends Controller
         Log::info('post');
         Log::warning('REQUEST ' . $request);
 
-        $this->sendAsyncFacebook($this->buildMessage($request));
+        $this->sendAsyncFacebook($this->verifyChat($request));
 
         return response()->json("EVENT_RECEIVED", 200);
     }
@@ -38,12 +39,12 @@ class FacebookController extends Controller
         $message = $body["message"]["text"];
 
         if (in_array(strtolower($message), $welcome)) {
-            $this->buildMessage($sender_id, DEBITS_MESSAGE);
+            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE);
         } else {
             if (!in_array(strtolower($message), $payment)) {
-                $this->buildMessage($sender_id, PLATE_MESSAGE);
+                return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             } else {
-                $this->buildMessage($sender_id, PAYMENT_MESSAGE);
+                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
             }
         }
     }
@@ -54,11 +55,11 @@ class FacebookController extends Controller
         $object->messaging_type = "RESPONSE";
         $recipient = new class{};
         $recipient->id = $sender_id;
-        $message = new class{};
-        $message->text = $message;
+        $message_obj = new class{};
+        $message_obj->text = $message;
 
         $object->recipient = $recipient;
-        $object->message = $message;
+        $object->message = $message_obj;
 
         return $object;
     }
