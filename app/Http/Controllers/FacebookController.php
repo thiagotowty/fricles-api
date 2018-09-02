@@ -24,8 +24,7 @@ class FacebookController extends Controller
     {
         Log::info('entrou');
 
-        Log::info(dd($request));
-
+        return response()->json(null, 200);
 //        $sender_id = $request->sender->id;
 //        $recipient_id = $request->recipient->id;
 
