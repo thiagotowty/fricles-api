@@ -25,3 +25,4 @@ Route::group(['prefix' => 'webhook'], function ()
 
 Route::get('debits/{placa}', 'FacebookController@getDebits');
 Route::get('payment/{amont}', 'FacebookController@paymentAtar');
+Route::get('test/{teste}', 'FacebookController@test');

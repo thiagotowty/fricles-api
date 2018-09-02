@@ -45,7 +45,7 @@ class FacebookController extends Controller
             if (!in_array(strtolower($message), $payment)) {
                 return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             } else {
-                if (preg_match('/[a-zA-Z0-9]{7}/', $message)) {
+                if (strlen($message) == 7) {
                     return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
                 }
 
@@ -127,5 +127,10 @@ class FacebookController extends Controller
         curl_close($curl);
 
         return response()->json($return , 200);
+    }
+
+    public function test($test)
+    {
+        dd(strlen($test));
     }
 }
