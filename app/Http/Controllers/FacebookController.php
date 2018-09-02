@@ -23,8 +23,8 @@ class FacebookController extends Controller
 
     public function webhookPOST(Request $request)
     {
+        Log::warning('request' . var_dump($request));
         Log::info('post');
-        Log::info('request' . var_dump($request));
 
 
 //        $return = new class {};
