@@ -36,7 +36,7 @@ class FacebookController extends Controller
 
         $body = $request->entry[0]["messaging"][0];
         $sender_id = $body["sender"]["id"];
-        $message = $body["message"]["text"];
+        $message = utf8_encode($body["message"]["text"]);
 
         if (in_array(strtolower($message), $welcome)) {
             return $this->buildMessage($sender_id, self::DEBITS_MESSAGE);
