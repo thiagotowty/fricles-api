@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class FacebookController extends Controller
 {
 
-    const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é: R$ 0,00';
+    const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é: R$ ';
     const PLATE_MESSAGE = 'Qual a sua placa?';
     const PAYMENT_METHOD_MESSAGE = 'Quer pagar pelo ATAR pay ou fazer um TED pelo BB?';
     const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: ';
@@ -46,7 +46,7 @@ class FacebookController extends Controller
                 return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
             } else {
                 if (strlen($message) == 7) {
-                    return $this->buildMessage($sender_id, self::DEBITS_MESSAGE);
+                    return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message));
                 }
 
                 return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
