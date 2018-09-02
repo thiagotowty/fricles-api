@@ -33,7 +33,7 @@ class FacebookController extends Controller
 
     private function verifyChat(Request $request)
     {
-        $payment_atar = ['atar'];
+        $payment_atar = ['atar', 'atar pay', 'atarpay', 'atar  pay'];
         $payment_bb = ['banco do brasil', 'bb'];
 
         $body = $request->entry[0]["messaging"][0];
