@@ -26,7 +26,7 @@ class FacebookController extends Controller
         Log::info('post');
         $sender_id = $request->entry[0]["messaging"][0]["sender"]["id"];
         if ($sender_id == "196748573818793")
-            return response(null, 200);
+            return response("EVENT_RECEIVED", 200);
 
         Log::warning('REQUEST ' . $request);
 
@@ -57,6 +57,6 @@ class FacebookController extends Controller
         Log::warning("STATUS_CODE " . $info['http_code']);
         Log::warning("CURL " . $retorno);
 
-        return response(null, 200);
+        return response("EVENT_RECEIVED", 200);
     }
 }
