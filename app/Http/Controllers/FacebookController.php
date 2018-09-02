@@ -39,19 +39,32 @@ class FacebookController extends Controller
         $sender_id = $body["sender"]["id"];
         $message = utf8_encode($body["message"]["text"]);
 
-        if (in_array(strtolower($message), $welcome)) {
-            return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
+        if (strlen($message) == 7) {
+            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message) . self::PAYMENT_METHOD_MESSAGE);
         } else {
-            if (!in_array(strtolower($message), $payment)) {
-                return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
+            if  (in_array(strtolower($message), $payment)) {
+                // gera link
             } else {
-                if (strlen($message) == 7) {
-                    return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message));
-                }
-
-                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
+                return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             }
         }
+
+//
+//        if (in_array(strtolower($message), $welcome)) {
+//            return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
+//        } else {
+//            if (!in_array(strtolower($message), $payment)) {
+//
+//                if (strlen($message) == 7) {
+//                    return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message));
+//                } else {
+//                    return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
+//                }
+////                return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
+//            } else {
+//                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
+//            }
+//        }
     }
 
     private function buildMessage($sender_id, $message)
