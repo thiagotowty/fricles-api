@@ -27,8 +27,8 @@ class FacebookController extends Controller
         Log::warning('REQUEST ' . $request);
         $recipient_id = $request->entry[0]["messaging"][0]["recipient"]["id"];
         $sender_id = $request->entry[0]["messaging"][0]["sender"]["id"];
-        if ($recipient_id != "196748573818793")
-            return response()->json("EVENT_RECEIVED", 200);
+//        if ($recipient_id != "196748573818793")
+//            return response()->json("EVENT_RECEIVED", 200);
 
         $object = new class{};
         $object->messaging_type = "RESPONSE";
