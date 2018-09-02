@@ -9,6 +9,7 @@ class FacebookController extends Controller
 {
     public function webhookGET(Request $request)
     {
+        Log::info('get');
 //        $verify_token = 'abcdefg12345678';
 //
         $hub_challenge = $request->hub_challenge;
@@ -22,7 +23,7 @@ class FacebookController extends Controller
 
     public function webhookPOST(Request $request)
     {
-        Log::info('entrou');
+        Log::info('post');
 
         return response()->json(null, 200);
 //        $sender_id = $request->sender->id;
