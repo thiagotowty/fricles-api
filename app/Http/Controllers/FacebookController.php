@@ -43,8 +43,11 @@ class FacebookController extends Controller
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
                 'Content-Type: application/json'
         ));
-        curl_exec($curl);
-//        $retorno = json_decode(curl_exec($curl));
+//        curl_exec($curl);
+        $retorno = json_decode(curl_exec($curl));
+
+        Log::info("======================================================================");
+        Log::warning("CURL " . $retorno);
 
         return response(null, 200);
     }
