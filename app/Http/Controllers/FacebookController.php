@@ -101,7 +101,7 @@ class FacebookController extends Controller
 
     }
 
-    public function getDebits($plate)
+    private function getDebits($plate)
     {
         $url = "https://api.emplacai.towty.com.br/placa/" . $plate;
         $curl = curl_init($url);
@@ -121,7 +121,7 @@ class FacebookController extends Controller
             $valor_total = $debits->Valor;
         }
 
-        return response()->json($valor_total, 200);
+        return $valor_total;
 
     }
 
