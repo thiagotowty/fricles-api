@@ -40,7 +40,7 @@ class FacebookController extends Controller
         $message = utf8_encode($body["message"]["text"]);
 
         if (strlen($message) == 7) {
-            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message) . self::PAYMENT_METHOD_MESSAGE);
+            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message) . '.\n\n\n' . self::PAYMENT_METHOD_MESSAGE);
         } else {
             if  (in_array(strtolower($message), $payment)) {
                 // gera link
