@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -40,10 +41,26 @@ class FacebookController extends Controller
         $message = utf8_encode($body["message"]["text"]);
 
         if (strlen($message) == 7) {
-            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message) . '.\n\n\n' . self::PAYMENT_METHOD_MESSAGE);
+            $value = $this->getDebits($message);
+
+            $conversa = Conversas::getBySender($sender_id);
+            if (is_null($conversa))
+                $conversa = new Conversas();
+
+            $conversa->sender = $sender_id;
+            $conversa->placa = $message;
+            $conversa->debitos = $value;
+            $conversa->save();
+
+            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $value . '. ' . self::PAYMENT_METHOD_MESSAGE);
         } else {
             if  (in_array(strtolower($message), $payment)) {
-                // gera link
+                $conversa = Conversas::getBySender($sender_id);
+
+                $value_format = $conversa->debitos * 100;
+                $link = $this->paymentAtar($value_format);
+
+                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $link);
             } else {
                 return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             }
@@ -125,7 +142,7 @@ class FacebookController extends Controller
 
     }
 
-    public function paymentAtar($value)
+    private function paymentAtar($value)
     {
         $object = new class{};
         $object->amount = $value;
@@ -139,7 +156,7 @@ class FacebookController extends Controller
         $return = json_decode(curl_exec($curl));
         curl_close($curl);
 
-        return response()->json($return , 200);
+        return $return->link;
     }
 
     public function test($test)
