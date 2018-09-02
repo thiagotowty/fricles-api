@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 class FacebookController extends Controller
 {
+    const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é'
+    const PLATE_MESSAGE = 'Qual a sua placa?'
+    const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: '
+
     public function webhookGET(Request $request)
     {
         Log::info('get');
@@ -24,16 +28,34 @@ class FacebookController extends Controller
         return response()->json("EVENT_RECEIVED", 200);
     }
 
-    private function buildMessage(Request $request)
+    private function verifyChat(Request $request)
     {
-        $sender_id = $request->entry[0]["messaging"][0]["sender"]["id"];
+        $welcome = ['olá', 'quero', 'ver', 'documentos', 'débitos', 'veículo', 'carro', 'meu'];
+        $payment = ['BB', 'banco do brasil', 'atar'];
 
+        $body = $request->entry[0]["messaging"][0];
+        $sender_id = $body["sender"]["id"];
+        $message = $body["message"]["text"];
+
+        if (in_array(strtolower($message), $welcome)) {
+            $this->buildMessage($sender_id, DEBITS_MESSAGE);
+        } else {
+            if (!in_array(strtolower($message), $payment)) {
+                $this->buildMessage($sender_id, PLATE_MESSAGE);
+            } else {
+                $this->buildMessage($sender_id, PAYMENT_MESSAGE);
+            }
+        }
+    }
+
+    private function buildMessage($sender_id, $message)
+    {
         $object = new class{};
         $object->messaging_type = "RESPONSE";
         $recipient = new class{};
         $recipient->id = $sender_id;
         $message = new class{};
-        $message->text = "Teste legal";
+        $message->text = $message;
 
         $object->recipient = $recipient;
         $object->message = $message;
