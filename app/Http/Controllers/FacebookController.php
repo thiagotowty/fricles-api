@@ -25,7 +25,7 @@ class FacebookController extends Controller
     {
         Log::info('post');
 
-        Log::warning('request' . $request->message["text"]);
+        Log::warning('request' . $request);
 
         return response(null, 200);
 
