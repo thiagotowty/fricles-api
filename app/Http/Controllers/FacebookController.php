@@ -55,7 +55,10 @@ class FacebookController extends Controller
             }
 
             if (in_array(strtolower($message), $payment_bb)) {
-
+                $link = "http://www.bb.com.br/pbb/rapido?t=YT02Mjk3JmM9MTc2NDE5Jmg9MSZkPTAzMDkyMDE4JnY9NTAwMDAmdD0x";
+                if ((float)$message < 50)
+                    $link = "http://www.bb.com.br/pbb/rapido?t=YT02Mjk3JmM9MTc2NDE5Jmg9MSZkPTA0MDcyMDE4JnY9MTAwMDAmdD0x";
+                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $link);
             }
 
             return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
