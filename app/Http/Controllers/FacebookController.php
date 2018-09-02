@@ -67,20 +67,37 @@ class FacebookController extends Controller
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $retorno = json_decode(curl_exec($curl));
 
-        $debitos = $retorno->Conteudo->Debitos->DebitosDTO->Debito->DebitoDETRANNETDTO;
+        $debits = $retorno->Conteudo->Debitos->DebitosDTO->Debito->DebitoDETRANNETDTO;
 
         $valor_total = 0;
-        if(is_array($debitos)) {
-            foreach ($debitos as $debito) {
-                if($debito->Tipo == "IPVA01") continue;
+        if(is_array($debits)) {
+            foreach ($debits as $debit) {
+                if($debit->Tipo == "IPVA01") continue;
 
-                $valor_total += $debito->Valor;
+                $valor_total += $debit->Valor;
             }
         } else {
-            $valor_total = $debitos->Valor;
+            $valor_total = $debits->Valor;
         }
 
         return response()->json($valor_total, 200);
 
+    }
+
+    public function paymentAtar($value)
+    {
+        $object = new class{};
+        $object->amount = $value;
+        $curl = curl_init("https://pay-dot-wearatar-dev.appspot.com/transfer/share");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($object));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Basic ZW1wbGFjYWlfdGVzdF92OGExcjZlZmxlRHJsdXN0OjQ2QTQzMTUyLTY1QkEtNEJERC04MjI3LTJGODRGQ0IzMTBEOQ=='
+        ));
+        $return = json_decode(curl_exec($curl));
+        curl_close($curl);
+
+        return response()->json($return , 200);
     }
 }
