@@ -48,9 +48,9 @@ class FacebookController extends Controller
 //        $info = curl_getinfo($curl);
 //        curl_close($curl);
 
-        Log::info("======================================================================");
-        Log::warning("STATUS_CODE " . $info['http_code']);
-        Log::warning("CURL " . $retorno);
+//        Log::info("======================================================================");
+//        Log::warning("STATUS_CODE " . $info['http_code']);
+//        Log::warning("CURL " . $retorno);
 
         return response(null, 200);
     }
