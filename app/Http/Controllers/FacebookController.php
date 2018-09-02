@@ -41,7 +41,7 @@ class FacebookController extends Controller
         $object->message = $message;
 
 
-        $access_token = "EAAFdwO6fUOcBAJZCgCH2IHTuSezOyl2oK18Fyqs8LY5ZBEB8iZA7mtWBnl5xvSzeiWazemBXn1ZB4pqNZAyUVyHuUPu1oet4pk5ihehZBAZAZAAIVZAQFe4r2jlLngIzo062bCZAc2pMLvwmCc2a0hZCV24uwuEJbr2SZAIZC1CRXG18kelDmkpEN4k8H";
+        $access_token = "EAAFdwO6fUOcBAELFNEYDNEdF7AEvQUa1YgbU2ZBoqNz3pR3zIFZAh1ynDF5txUql8cYIAVXqhJtZCkOJ5AH5q6ZCTfJrCbLTse4BUQdw7LIlyjTac0KcEiTmgXKnyl2dZATQTUlvA4tTHKVfETSuSaDZAFEM01ZCJU828ZCHXigLPAZDZD";
         $curl = curl_init("https://graph.facebook.com/v2.6/me/messages?access_token=".$access_token);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($object));
