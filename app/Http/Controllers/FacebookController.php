@@ -10,6 +10,7 @@ class FacebookController extends Controller
 
     const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é';
     const PLATE_MESSAGE = 'Qual a sua placa?';
+    const PAYMENT_METHOD_MESSAGE = 'Quer pagar pelo ATAR pay ou fazer um TED pelo BB?';
     const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: ';
 
     public function webhookGET(Request $request)
@@ -31,7 +32,7 @@ class FacebookController extends Controller
 
     private function verifyChat(Request $request)
     {
-        $welcome = ['olá', 'quero', 'ver', 'documentos', 'débitos', 'veículo', 'carro', 'meu'];
+        $welcome = ['olá', 'ola', 'quero', 'ver', 'documentos', 'debitos', 'débitos', 'veículo', 'carro', 'meu', 'veiculo'];
         $payment = ['BB', 'banco do brasil', 'atar'];
 
         $body = $request->entry[0]["messaging"][0];
@@ -44,6 +45,10 @@ class FacebookController extends Controller
             if (!in_array(strtolower($message), $payment)) {
                 return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             } else {
+                if (preg_match('/[a-zA-Z0-9]{7}/', $message)) {
+                    return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
+                }
+
                 return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
             }
         }
