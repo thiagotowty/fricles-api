@@ -25,27 +25,26 @@ class FacebookController extends Controller
     {
         Log::info('post');
 
-        return response()->json(null, 200);
-//        $sender_id = $request->sender->id;
-//        $recipient_id = $request->recipient->id;
+        $sender_id = $request->sender->id;
+        $recipient_id = $request->recipient->id;
 
-//        Log::info('$sender_id ' . $sender_id);
-//        Log::info('$recipient_id ' . $recipient_id);
-//
-//        $retorno = new class{};
-//        $retorno->sender = new class {};
-//        $retorno->sender->id = $sender_id;
-//
-//        $retorno->recipient = new class {};
-//        $retorno->recipient->id = $recipient_id;
-//
-//        $retorno->message = new class{};
-//        if ($request->message->text == 1) {
-//            $retorno->message->text = "deu certo";
-//        }
-//
-//        $retorno->message->text = "não deu certo";
-//
-//        return response()->json($retorno, 200);
+        Log::info('$sender_id ' . $sender_id);
+        Log::info('$recipient_id ' . $recipient_id);
+
+        $retorno = new class{};
+        $retorno->sender = new class {};
+        $retorno->sender->id = $sender_id;
+
+        $retorno->recipient = new class {};
+        $retorno->recipient->id = $recipient_id;
+
+        $retorno->message = new class{};
+        if ($request->message->text == 1) {
+            $retorno->message->text = "deu certo";
+        }
+
+        $retorno->message->text = "não deu certo";
+
+        return response()->json($retorno, 200);
     }
 }
