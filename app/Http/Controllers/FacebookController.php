@@ -14,6 +14,9 @@ class FacebookController extends Controller
     const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: ';
     const NOT_FOUND = 'Não encontramos seu veículo. ';
 
+    const CRITERIA_ATAR = ['atar', 'atar pay', 'atarpay', 'atar  pay'];
+    const CRITERIA_BB = ['banco do brasil', 'bb'];
+
     public function webhookGET(Request $request)
     {
         Log::info('get');
@@ -33,34 +36,38 @@ class FacebookController extends Controller
 
     private function verifyChat(Request $request)
     {
-        $payment_atar = ['atar', 'atar pay', 'atarpay', 'atar  pay'];
-        $payment_bb = ['banco do brasil', 'bb'];
-
         $body = $request->entry[0]["messaging"][0];
         $sender_id = $body["sender"]["id"];
         $message = utf8_encode($body["message"]["text"]);
 
         if (strlen($message) == 7) {
-            $value = $this->getDebits($message);
-            $this->saveConversation($sender_id, $message, $value);
-            return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $value . '. ' . self::PAYMENT_METHOD_MESSAGE);
+            return $this->sendTotalDebitsMessage($message, $sender_id)
         } else {
-            if (in_array(strtolower($message), $payment_atar)) {
-                $conversa = Conversas::getBySender($sender_id);
-
-                if (is_null($conversa))
-                    return $this->buildMessage($sender_id, self::NOT_FOUND . self::PLATE_MESSAGE);
-
-                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $this->paymentAtar($conversa->debitos * 100));
+            if (in_array(strtolower($message), self::CRITERIA_ATAR)) {
+                return $this->sendPayWithAtarMessage($sender_id)
             }
 
-            if (in_array(strtolower($message), $payment_bb)) {
+            if (in_array(strtolower($message), self::CRITERIA_BB)) {
                 return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . "http://www.bb.com.br/pbb/rapido?t=YT02Mjk3JmM9MTc2NDE5Jmg9MSZkPTA0MDcyMDE4JnY9MTAwMDAmdD0x");
             }
 
             return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
-
         }
+    }
+
+    private function sendTotalDebitsMessage($message, $sender_id) {
+        $value = $this->getDebits($message);
+        $this->saveConversation($sender_id, $message, $value);
+        return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $value . '. ' . self::PAYMENT_METHOD_MESSAGE);
+    }
+
+    private function sendPayWithAtarMessage($sender_id) {
+        $conversa = Conversas::getBySender($sender_id);
+
+        if (is_null($conversa))
+            return $this->buildMessage($sender_id, self::NOT_FOUND . self::PLATE_MESSAGE);
+
+        return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $this->paymentAtar($conversa->debitos * 100));
     }
 
     private function saveConversation($sender_id, $message, $value)
@@ -102,10 +109,6 @@ class FacebookController extends Controller
         $retorno = curl_exec($curl);
         $info = curl_getinfo($curl);
         curl_close($curl);
-
-        Log::info("======================================================================");
-        Log::warning("STATUS_CODE " . $info['http_code']);
-        Log::warning("CURL " . $retorno);
     }
 
     private function getDebits($plate)
@@ -117,17 +120,21 @@ class FacebookController extends Controller
 
         $debits = $retorno->Conteudo->Debitos->DebitosDTO->Debito->DebitoDETRANNETDTO;
 
-        $valor_total = 0;
+        return $this->getDebitsTotal($debits);
+    }
+
+    private function getDebitsTotal($debits) {
+        $result = 0;
         if(is_array($debits)) {
             foreach ($debits as $debit) {
                 if($debit->Tipo == "IPVA01") continue;
-                $valor_total += $debit->Valor;
+                $result += $debit->Valor;
             }
         } else {
-            $valor_total = $debits->Valor;
+            $result = $debits->Valor;
         }
 
-        return $valor_total;
+        return $result;
     }
 
     private function paymentAtar($value)
