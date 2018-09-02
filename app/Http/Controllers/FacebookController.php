@@ -10,25 +10,23 @@ class FacebookController extends Controller
     public function webhookGET(Request $request)
     {
         Log::info('get');
-//        $verify_token = 'abcdefg12345678';
-//
         $hub_challenge = $request->hub_challenge;
-//        $hub_verify_token  = $request->hub_verify_token;
-//
-//        if ($verify_token == $hub_verify_token)
         return response($hub_challenge, 200);
-//
-//        return response(null, 403);
     }
 
     public function webhookPOST(Request $request)
     {
         Log::info('post');
         Log::warning('REQUEST ' . $request);
-        $recipient_id = $request->entry[0]["messaging"][0]["recipient"]["id"];
+
+        $this->sendAsyncFacebook($this->buildMessage($request));
+
+        return response()->json("EVENT_RECEIVED", 200);
+    }
+
+    private function buildMessage(Request $request)
+    {
         $sender_id = $request->entry[0]["messaging"][0]["sender"]["id"];
-//        if ($recipient_id != "196748573818793")
-//            return response()->json("EVENT_RECEIVED", 200);
 
         $object = new class{};
         $object->messaging_type = "RESPONSE";
@@ -40,15 +38,18 @@ class FacebookController extends Controller
         $object->recipient = $recipient;
         $object->message = $message;
 
+        return $object;
+    }
 
+    private function sendAsyncFacebook($data)
+    {
         $access_token = "EAAFdwO6fUOcBAELFNEYDNEdF7AEvQUa1YgbU2ZBoqNz3pR3zIFZAh1ynDF5txUql8cYIAVXqhJtZCkOJ5AH5q6ZCTfJrCbLTse4BUQdw7LIlyjTac0KcEiTmgXKnyl2dZATQTUlvA4tTHKVfETSuSaDZAFEM01ZCJU828ZCHXigLPAZDZD";
         $curl = curl_init("https://graph.facebook.com/v2.6/me/messages?access_token=".$access_token);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($object));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/json'
+            'Content-Type: application/json'
         ));
-//        curl_exec($curl);
         $retorno = curl_exec($curl);
         $info = curl_getinfo($curl);
         curl_close($curl);
@@ -57,6 +58,5 @@ class FacebookController extends Controller
         Log::warning("STATUS_CODE " . $info['http_code']);
         Log::warning("CURL " . $retorno);
 
-        return response()->json("EVENT_RECEIVED", 200);
     }
 }
