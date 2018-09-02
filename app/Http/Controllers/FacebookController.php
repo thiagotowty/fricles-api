@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class FacebookController extends Controller
 {
-
     const DEBITS_MESSAGE = 'O valor total dos débitos do seu veículo é: R$ ';
     const PLATE_MESSAGE = 'Qual a sua placa?';
     const PAYMENT_METHOD_MESSAGE = 'Quer pagar pelo ATAR pay ou fazer um TED pelo BB?';
     const PAYMENT_MESSAGE = 'Clique nesse link e efetue o pagamento: ';
+    const NOT_FOUND = 'Não encontramos seu veículo. ';
 
     public function webhookGET(Request $request)
     {
@@ -33,8 +33,8 @@ class FacebookController extends Controller
 
     private function verifyChat(Request $request)
     {
-        $welcome = ['olá', 'ola', 'quero', 'ver', 'documentos', 'debitos', 'débitos', 'veículo', 'carro', 'meu', 'veiculo'];
-        $payment = ['BB', 'banco do brasil', 'atar'];
+        $payment_atar = ['atar'];
+        $payment_bb = ['banco do brasil', 'bb'];
 
         $body = $request->entry[0]["messaging"][0];
         $sender_id = $body["sender"]["id"];
@@ -54,34 +54,17 @@ class FacebookController extends Controller
 
             return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $value . '. ' . self::PAYMENT_METHOD_MESSAGE);
         } else {
-            if  (in_array(strtolower($message), $payment)) {
+            if (in_array(strtolower($message), $payment_atar)) {
                 $conversa = Conversas::getBySender($sender_id);
 
-                $value_format = $conversa->debitos * 100;
-                $link = $this->paymentAtar($value_format);
+                if (is_null($conversa))
+                    return $this->buildMessage($sender_id, self::NOT_FOUND . self::PLATE_MESSAGE);
 
-                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $link);
+                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $this->paymentAtar($conversa->debitos * 100));
             } else {
                 return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             }
         }
-
-//
-//        if (in_array(strtolower($message), $welcome)) {
-//            return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
-//        } else {
-//            if (!in_array(strtolower($message), $payment)) {
-//
-//                if (strlen($message) == 7) {
-//                    return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $this->getDebits($message));
-//                } else {
-//                    return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
-//                }
-////                return $this->buildMessage($sender_id, self::PAYMENT_METHOD_MESSAGE);
-//            } else {
-//                return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE);
-//            }
-//        }
     }
 
     private function buildMessage($sender_id, $message)
@@ -157,10 +140,5 @@ class FacebookController extends Controller
         curl_close($curl);
 
         return $return->link;
-    }
-
-    public function test($test)
-    {
-        dd(strlen($test));
     }
 }
