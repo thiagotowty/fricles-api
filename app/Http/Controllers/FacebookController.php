@@ -111,6 +111,7 @@ class FacebookController extends Controller
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json'
         ));
+        curl_exec($curl);
         curl_close($curl);
     }
 
