@@ -40,11 +40,16 @@ class FacebookController extends Controller
         $sender_id = $body["sender"]["id"];
         $message = utf8_encode($body["message"]["text"]);
 
+        return $this->sendChat($sender_id, $message);
+    }
+
+    private function sendChat($sender_id, $message)
+    {
         if (strlen($message) == 7) {
-            return $this->sendTotalDebitsMessage($message, $sender_id)
+            return $this->sendTotalDebitsMessage($message, $sender_id);
         } else {
             if (in_array(strtolower($message), self::CRITERIA_ATAR)) {
-                return $this->sendPayWithAtarMessage($sender_id)
+                return $this->sendPayWithAtarMessage($sender_id);
             }
 
             if (in_array(strtolower($message), self::CRITERIA_BB)) {
