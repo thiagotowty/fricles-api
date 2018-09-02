@@ -42,16 +42,7 @@ class FacebookController extends Controller
 
         if (strlen($message) == 7) {
             $value = $this->getDebits($message);
-
-            $conversa = Conversas::getBySender($sender_id);
-            if (is_null($conversa))
-                $conversa = new Conversas();
-
-            $conversa->sender = $sender_id;
-            $conversa->placa = $message;
-            $conversa->debitos = $value;
-            $conversa->save();
-
+            $this->saveConversation($sender_id, $message, $value);
             return $this->buildMessage($sender_id, self::DEBITS_MESSAGE . $value . '. ' . self::PAYMENT_METHOD_MESSAGE);
         } else {
             if (in_array(strtolower($message), $payment_atar)) {
@@ -61,10 +52,27 @@ class FacebookController extends Controller
                     return $this->buildMessage($sender_id, self::NOT_FOUND . self::PLATE_MESSAGE);
 
                 return $this->buildMessage($sender_id, self::PAYMENT_MESSAGE . $this->paymentAtar($conversa->debitos * 100));
-            } else {
-                return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
             }
+
+            if (in_array(strtolower($message), $payment_bb)) {
+
+            }
+
+            return $this->buildMessage($sender_id, self::PLATE_MESSAGE);
+
         }
+    }
+
+    private function saveConversation($sender_id, $message, $value)
+    {
+        $conversa = Conversas::getBySender($sender_id);
+        if (is_null($conversa))
+            $conversa = new Conversas();
+
+        $conversa->sender = $sender_id;
+        $conversa->placa = strtolower($message);
+        $conversa->debitos = $value;
+        $conversa->save();
     }
 
     private function buildMessage($sender_id, $message)
@@ -98,7 +106,6 @@ class FacebookController extends Controller
         Log::info("======================================================================");
         Log::warning("STATUS_CODE " . $info['http_code']);
         Log::warning("CURL " . $retorno);
-
     }
 
     private function getDebits($plate)
@@ -114,7 +121,6 @@ class FacebookController extends Controller
         if(is_array($debits)) {
             foreach ($debits as $debit) {
                 if($debit->Tipo == "IPVA01") continue;
-
                 $valor_total += $debit->Valor;
             }
         } else {
@@ -122,7 +128,6 @@ class FacebookController extends Controller
         }
 
         return $valor_total;
-
     }
 
     private function paymentAtar($value)
