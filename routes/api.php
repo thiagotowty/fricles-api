@@ -22,3 +22,5 @@ Route::group(['prefix' => 'webhook'], function ()
     Route::get('', 'FacebookController@webhookGET');
     Route::post('', 'FacebookController@webhookPOST');
 });
+
+Route::get('debitos/{placa}', 'FacebookController@getDebits');

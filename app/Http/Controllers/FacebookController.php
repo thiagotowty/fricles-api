@@ -59,4 +59,28 @@ class FacebookController extends Controller
         Log::warning("CURL " . $retorno);
 
     }
+
+    public function getDebits($plate)
+    {
+        $url = "https://api.emplacai.towty.com.br/placa/" . $plate;
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $retorno = json_decode(curl_exec($curl));
+
+        $debitos = $retorno->Conteudo->Debitos->DebitosDTO->Debito->DebitoDETRANNETDTO;
+
+        $valor_total = 0;
+        if(is_array($debitos)) {
+            foreach ($debitos as $debito) {
+                if($debito->Tipo == "IPVA01") continue;
+
+                $valor_total += $debito->Valor;
+            }
+        } else {
+            $valor_total = $debitos->Valor;
+        }
+
+        return response()->json($valor_total, 200);
+
+    }
 }
