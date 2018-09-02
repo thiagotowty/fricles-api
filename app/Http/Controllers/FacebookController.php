@@ -24,12 +24,12 @@ class FacebookController extends Controller
     public function webhookPOST(Request $request)
     {
         Log::info('post');
+        Log::warning('REQUEST ' . $request);
         $recipient_id = $request->entry[0]["messaging"][0]["recipient"]["id"];
         $sender_id = $request->entry[0]["messaging"][0]["sender"]["id"];
         if ($recipient_id == "196748573818793")
-            return response()->json("EVENT_RECEIVED", 200);
+        return response()->json("EVENT_RECEIVED", 200);
 
-        Log::warning('REQUEST ' . $request);
 
         $object = new class{};
         $object->messaging_type = "RESPONSE";
